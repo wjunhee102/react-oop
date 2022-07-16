@@ -12,6 +12,7 @@ const Error: React.FC<ErrorProps> = ({
 
   const closeError = useCallback(() => {
     setError(null);
+  // eslint-disable-next-line
   }, []);
 
   if(!error) {
@@ -19,11 +20,11 @@ const Error: React.FC<ErrorProps> = ({
   }
 
   return (
-    <div className="absolute flex justify-center items-center left-0 top-0 w-screen h-screen bg-slate-700 bg-opacity-40">
-      <div className="bg-white shadow rounded">
+    <div className="absolute top-0 left-0 flex items-center justify-center w-screen h-screen bg-slate-700 bg-opacity-40">
+      <div className="bg-white rounded shadow">
         <p>{error}</p>
 
-        <div className="w-full flex justify-center">
+        <div className="flex justify-center w-full">
           <button onClick={closeError}>
             확인
           </button>

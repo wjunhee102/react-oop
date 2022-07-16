@@ -48,12 +48,10 @@ export class TodoModule<T extends TodoModuleProps> implements Module {
     this.loadingComponent = loadingComponent;
     this.errorComponent   = errorComponent;
     this.todoView         = view;
-
-    this.element = this.element.bind(this);
   }
 
   /* eslint-disable */
-  public element({ title }: TodoElementProps) {
+  public element = ({ title }: TodoElementProps) => {
 
     const [ todoList, setTodoList ]           = useState<TodoArray>(new TodoArray());
     const [ currentTodoId, setCurrentTodoId ] = useState<string | null>(null);
@@ -125,7 +123,6 @@ export class TodoModule<T extends TodoModuleProps> implements Module {
     const Loading  = this.loadingComponent;
     const TodoView = this.todoView;
     const Error    = this.errorComponent;
-
 
     const viewProps = {
       title,

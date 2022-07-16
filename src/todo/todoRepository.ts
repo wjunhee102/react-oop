@@ -1,4 +1,4 @@
-import { Repository } from "../abstract/repository";
+import { Repository } from "../abstract/repository/repository";
 import { TodoArray } from "./TodoList";
 
 
@@ -12,7 +12,8 @@ export class TodoRepository implements Repository {
     path: string, 
     query?: object
   ): Promise<any> {
-    return Promise.resolve({ date: [ TodoArray.createTodo("") ] });
+    // return Promise.resolve({ date: [ TodoArray.createTodo("") ] });
+    return Promise.reject("error");
   }
 
   public postFetch (

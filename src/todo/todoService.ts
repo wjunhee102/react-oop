@@ -3,7 +3,45 @@ import { Todo } from "./todoEntity";
 import { TodoArray } from "./TodoList";
 import { TodoRepository } from "./todoRepository";
 import { TodoValidation } from "./todoValidation";
+import "reflect-metadata";
 
+function Error(message: string) {
+  return function (target: any, key: string, desc: PropertyDescriptor) {
+
+    const method = desc.value;
+
+    desc.value = async function(...args: any[]) {
+      try {
+        return await method.apply(this, args);
+      } catch(e) {
+        const errorMessage = typeof e === "string"? e : "e";
+        
+        return new TodoArray(TodoArray.createTodo("데코"), TodoArray.createTodo("message"), TodoArray.createTodo(errorMessage));
+      }
+    }
+
+  }
+}
+
+function Injectable(): ClassDecorator {
+  return (target: object) => {
+    Reflect.defineMetadata("__injectable__", true, target);
+  };
+}
+
+// emitDecoratorMetadata가 작동하지 않음...
+function LogType(target: any, key: string) {
+  const allType = Reflect.getMetadataKeys(target);
+  const type = Reflect.getMetadata("design:type", target, key);
+  const types = Reflect.getMetadata("design:paramtypes", target, key);
+  console.log(allType, type, types);
+  // console.log("types", types);
+
+  // console.log(`${key} type: ${type}`);
+
+}
+
+@Injectable()
 export class TodoService {
 
   constructor(
@@ -11,25 +49,24 @@ export class TodoService {
     private todoValidation: TodoValidation
   ) {}
 
+  @LogType
+  public aaaa: string = "";
+
+  @Error("잘 됩니다.")
+  @LogType
   public async getTodoListInStorage(): Promise<TodoArray | null> {
+    const result = await this.todoRepository.getFetch("todo");
 
-    try {
-      
-      const result = await this.todoRepository.getFetch("todo");
+    const todoList = this.todoValidation.vaildateTodoGet(result);
 
-      const todoList = this.todoValidation.vaildateTodoGet(result);
-
-      if(todoList) {
-        return new TodoArray(...todoList);
-      }
-
-    } catch(e) {
-      return null;
+    if(todoList) {
+      return new TodoArray(...todoList);
     }
 
     return null;
   }
 
+  @LogType
   public async saveTodoListInStorage(todoList: TodoArray): Promise<boolean> {
 
     try {
@@ -68,6 +105,7 @@ export class TodoService {
     return false;
   }
 
+  @LogType
   public onEditMode(
     setCurrentTodoId: (id: string | null) => void,
     setTodoText: (text: string) => void,
@@ -209,11 +247,13 @@ export class TodoService {
     setLoading(true);
 
     const todoList = await this.getTodoListInStorage();
-    
+
     if(todoList) {
       setTodoList(todoList);
+
     } else {
       setError("todo list를 불러오지 못했습니다.");
+      
       setTodoList(new TodoArray(TodoArray.createTodo("투두")));
     }
 
@@ -221,3 +261,5 @@ export class TodoService {
   }
 
 }
+
+console.log("TestService", Reflect.getMetadata("design:type", TodoRepository.prototype, "getTodoListInStorage"));
